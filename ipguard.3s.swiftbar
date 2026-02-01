@@ -1,0 +1,54 @@
+#!/bin/bash
+# ipguard.swiftbar.sh - SwiftBar Menu Bar Plugin
+#
+# ---
+# Title: ipguard
+# Refresh: 3s
+# ---
+
+SOCKET="$HOME/.config/ipguard/ipguard.sock"
+
+# ─── Action handler ──────────────────────────────────────────────────────────
+if [ "$1" = "ACK" ]; then
+    echo "ACK" | socat - UNIX-CONNECT:"$SOCKET" >/dev/null 2>&1
+    exit 0
+fi
+
+# ─── Query state ─────────────────────────────────────────────────────────────
+RESPONSE=$(echo "STATE" | socat - UNIX-CONNECT:"$SOCKET" 2>/dev/null)
+
+if [ -z "$RESPONSE" ]; then
+    # Binary not running or socket unreachable
+    echo "⚪ | color=gray"
+    echo "---"
+    echo "ipguard not running"
+    exit 0
+fi
+
+STATE=$(echo "$RESPONSE" | cut -d: -f1)
+IP=$(echo "$RESPONSE" | cut -d: -f2 | tr -d '\n')
+
+# ─── Menu bar title (orb only) + dropdown with IP ────────────────────────────
+case "$STATE" in
+    PROTECTED)
+        echo "🟢 | color=green"
+        echo "---"
+        echo "$IP"
+        ;;
+    ISOLATED)
+        echo "🔴 | color=red"
+        echo "---"
+        echo "ISOLATED"
+        echo "Acknowledge | bash=$0 param1=ACK refresh=true terminal=false"
+        ;;
+    UNPROTECTED)
+        echo "🟡 | color=#DAA520"
+        echo "---"
+        echo "$IP"
+        ;;
+    *)
+        echo "⚪ | color=gray"
+        echo "---"
+        echo "Unknown state: $STATE"
+        ;;
+esac
