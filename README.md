@@ -1,6 +1,6 @@
 # ipguard
 
-A macOS network kill switch that monitors your public IP and cuts network adapters if it drifts from an expected value. Useful for ensuring traffic stays routed through a specific VPS/tunnel..
+A macOS network kill switch that monitors your public IP and cuts network adapters if it drifts from an expected value. Useful for ensuring traffic stays routed through a specific VPS/tunnel.
 
 > **Note:** This is a personal project, maintained on a best-effort basis. No support is provided.
 
